@@ -1,0 +1,17 @@
+{
+  "name": "sanju-portfolio",
+  "version": "1.0.0",
+  "description": "Sanju's Tech Student Portfolio & Research Portal",
+  "scripts": {
+    "dev": "npx serve -p 3000 .",
+    "start": "npx serve -p 3000 ."
+  },
+  "keywords": [
+    "portfolio",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "Sanju",
+  "license": "MIT"
+}
