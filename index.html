@@ -193,6 +193,10 @@
       display: inline-flex !important;
     }
 
+    #heroResumeLink:not(.resume-available) {
+      display: none !important;
+    }
+
     body.admin-mode-unlocked .admin-only-block {
       display: block !important;
     }
@@ -1451,6 +1455,36 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.75rem;
+        border-radius: 16px;
+        padding: 0.7rem 0.8rem;
+      }
+      .nav-brand {
+        flex: 1 1 auto;
+      }
+      .nav-links-list {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding: 0.15rem 0.1rem 0.25rem;
+        scrollbar-width: thin;
+      }
+      .nav-links-list::-webkit-scrollbar {
+        height: 4px;
+      }
+      .admin-nav-actions {
+        flex: 1 1 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .admin-sidebar {
+        width: min(var(--sidebar-width), 100vw);
+      }
+      .sidebar-header {
+        padding: 1rem;
+      }
+      .sidebar-body {
+        padding: 1rem;
       }
       .portal-squircle-grid {
         grid-template-columns: 1fr;
@@ -1573,6 +1607,10 @@
             <input type="text" id="inputName" class="form-input">
           </div>
           <div class="form-field">
+            <label class="form-label" for="inputHeroTitle">Hero Heading</label>
+            <input type="text" id="inputHeroTitle" class="form-input" placeholder="Building Scalable Systems & Future Tech with">
+          </div>
+          <div class="form-field">
             <label class="form-label" for="inputTagline">Headline / Role Tagline</label>
             <input type="text" id="inputTagline" class="form-input">
           </div>
@@ -1612,6 +1650,11 @@
           <div class="form-field">
             <label class="form-label" for="inputScholar">Google Scholar URL</label>
             <input type="url" id="inputScholar" class="form-input">
+          </div>
+          <div class="form-field admin-only-block">
+            <label class="form-label" for="fileResumeInput">Resume PDF (Admin only)</label>
+            <input type="file" id="fileResumeInput" class="form-input" accept="application/pdf,.pdf">
+            <small style="font-size: 0.72rem; color: var(--text-muted);">Upload a PDF to show the Resume link beside your social links.</small>
           </div>
         </div>
       </div>
@@ -1671,6 +1714,10 @@
             Add to Projects Portal
           </button>
         </div>
+        <div class="control-card">
+          <div class="control-card-title">🗑️ Manage Existing Projects</div>
+          <div id="adminProjectsList"></div>
+        </div>
       </div>
 
       <!-- TAB 4: Research Creator -->
@@ -1704,6 +1751,10 @@
           <button type="button" id="btnAddResearch" class="btn btn-primary btn-block">
             Add Publication Card
           </button>
+        </div>
+        <div class="control-card">
+          <div class="control-card-title">🗑️ Manage Publications</div>
+          <div id="adminResearchList"></div>
         </div>
       </div>
 
@@ -1750,6 +1801,10 @@
             Add Certification
           </button>
         </div>
+        <div class="control-card">
+          <div class="control-card-title">🗑️ Manage Experience & Certifications</div>
+          <div id="adminExperienceList"></div>
+        </div>
       </div>
 
       <!-- TAB 6: Books Written -->
@@ -1775,6 +1830,10 @@
           <button type="button" id="btnAddBook" class="btn btn-primary btn-block">
             Add Book to Portal
           </button>
+        </div>
+        <div class="control-card">
+          <div class="control-card-title">🗑️ Manage Books</div>
+          <div id="adminBooksList"></div>
         </div>
       </div>
 
@@ -1843,12 +1902,6 @@
                 alt="Profile Avatar" 
                 class="avatar-circular-img"
               >
-              <div class="floating-accent-tag floating-top-tag">
-                <span>🔬</span> Published Author
-              </div>
-              <div class="floating-accent-tag floating-bottom-tag">
-                <span>💻</span> Systems Architect
-              </div>
             </div>
           </div>
 
@@ -1859,8 +1912,8 @@
               <span id="heroBadgeText" data-editable="badgeText">Computer Science & Systems Researcher</span>
             </div>
 
-            <h1 class="hero-title powered-reveal stagger-2">
-              Building Scalable Systems & Future Tech with 
+            <h1 class="hero-title powered-reveal stagger-2" id="heroTitleDisplay">
+              Building Scalable Systems & Future Tech with
               <span class="name-highlight" id="heroNameDisplay" data-editable="name">Sanju</span>
             </h1>
 
@@ -1881,6 +1934,11 @@
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-pill" id="heroLinkedinLink">
                 <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                 <span>LinkedIn</span>
+              </a>
+
+              <a href="#" target="_blank" rel="noopener noreferrer" class="social-pill" id="heroResumeLink">
+                <span>📄</span>
+                <span>Resume</span>
               </a>
 
               <a href="#biography" class="btn btn-primary" style="border-radius: var(--radius-full); padding: 0.6rem 1.35rem;">
@@ -2175,6 +2233,7 @@
       const defaultState = {
         selectedFont: 'Ubuntu',
         name: 'Sanju',
+        heroTitle: 'Building Scalable Systems & Future Tech with',
         tagline: 'Computer Science Researcher, Author & Systems Engineer',
         badgeText: 'Computer Science & Systems Researcher',
         shortBio: 'Welcome to my digital knowledge base. Here you will find my peer-reviewed publications, authored books on system architecture, production-grade software projects, technical certifications, and comprehensive personal narrative.',
@@ -2183,7 +2242,8 @@
         socials: {
           github: 'https://github.com',
           linkedin: 'https://linkedin.com',
-          scholar: 'https://scholar.google.com'
+          scholar: 'https://scholar.google.com',
+          resume: ''
         },
 
         summary: {
@@ -2305,6 +2365,7 @@
       const btnCloseSidebar = document.getElementById('btnCloseSidebar');
       const btnOpenSidebarFromNav = document.getElementById('btnOpenSidebarFromNav');
       const btnExitAdmin = document.getElementById('btnExitAdmin');
+      const fileResumeInput = document.getElementById('fileResumeInput');
       const sidebarTabs = document.getElementById('sidebarTabs');
       const sidebarPanes = document.querySelectorAll('.sidebar-pane');
 
@@ -2321,6 +2382,10 @@
 
       // Containers
       const projectsContainer = document.getElementById('projectsContainer');
+      const adminProjectsList = document.getElementById('adminProjectsList');
+      const adminResearchList = document.getElementById('adminResearchList');
+      const adminExperienceList = document.getElementById('adminExperienceList');
+      const adminBooksList = document.getElementById('adminBooksList');
       const researchContainer = document.getElementById('researchContainer');
       const internshipsContainer = document.getElementById('internshipsContainer');
       const certificationsContainer = document.getElementById('certificationsContainer');
@@ -2392,7 +2457,27 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if (raw) {
             const parsed = JSON.parse(raw);
-            state = Object.assign({}, defaultState, parsed);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+              throw new Error('Stored portfolio state is not an object.');
+            }
+            state = Object.assign({}, defaultState, parsed, {
+              socials: Object.assign({}, defaultState.socials, parsed.socials),
+              summary: Object.assign({}, defaultState.summary, parsed.summary),
+              projects: Array.isArray(parsed.projects) ? parsed.projects : defaultState.projects,
+              research: Array.isArray(parsed.research) ? parsed.research : defaultState.research,
+              internships: Array.isArray(parsed.internships) ? parsed.internships : defaultState.internships,
+              certifications: Array.isArray(parsed.certifications) ? parsed.certifications : defaultState.certifications,
+              books: Array.isArray(parsed.books) ? parsed.books : defaultState.books
+            });
+            ['projects', 'research', 'internships', 'certifications', 'books'].forEach(collection => {
+              const usedIds = new Set();
+              state[collection] = state[collection].map((item, index) => {
+                let id = String(item.id || '');
+                if (!id || usedIds.has(id)) id = `${collection.slice(0, -1)}-${Date.now()}-${index}`;
+                usedIds.add(id);
+                return Object.assign({}, item, { id });
+              });
+            });
           } else {
             state = JSON.parse(JSON.stringify(defaultState));
           }
@@ -2403,6 +2488,7 @@
 
       function syncStateToSidebarInputs() {
         if (document.getElementById('inputName')) document.getElementById('inputName').value = state.name || '';
+        if (document.getElementById('inputHeroTitle')) document.getElementById('inputHeroTitle').value = state.heroTitle || '';
         if (document.getElementById('inputTagline')) document.getElementById('inputTagline').value = state.tagline || '';
         if (document.getElementById('inputShortBio')) document.getElementById('inputShortBio').value = state.shortBio || '';
         if (document.getElementById('inputGithub')) document.getElementById('inputGithub').value = (state.socials && state.socials.github) || '';
@@ -2434,6 +2520,10 @@
         renderFontCards();
 
         document.getElementById('navAuthorBrand').textContent = state.name;
+        const heroTitleDisplay = document.getElementById('heroTitleDisplay');
+        if (heroTitleDisplay) {
+          heroTitleDisplay.firstChild.textContent = `${state.heroTitle || defaultState.heroTitle} `;
+        }
         document.getElementById('heroNameDisplay').textContent = state.name;
         document.getElementById('footerAuthorName').textContent = state.name;
         document.getElementById('heroTaglineDisplay').textContent = state.tagline;
@@ -2444,7 +2534,11 @@
 
         document.getElementById('heroGithubLink').href = state.socials.github || '#';
         document.getElementById('heroLinkedinLink').href = state.socials.linkedin || '#';
-
+        const resumeLink = document.getElementById('heroResumeLink');
+        if (resumeLink) {
+          resumeLink.href = state.socials.resume || '#';
+          resumeLink.classList.toggle('resume-available', Boolean(state.socials.resume));
+        }
         syncStateToSidebarInputs();
 
         document.getElementById('summaryDegree').textContent = state.summary.degree;
@@ -2478,6 +2572,16 @@
 
       function renderProjects() {
         projectsContainer.innerHTML = '';
+        if (adminProjectsList) {
+          adminProjectsList.innerHTML = state.projects.length
+            ? state.projects.map(p => `
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; padding:0.65rem 0; border-bottom:1px solid var(--border-subtle);">
+                  <span style="font-size:0.82rem; font-weight:600; color:var(--text-main);">${escapeHtml(p.title)}</span>
+                  <button type="button" class="btn btn-secondary" style="flex:0 0 auto; color:#ef4444; font-size:0.72rem; padding:0.3rem 0.55rem;" data-action="delete-project" data-id="${escapeHtml(p.id)}">✕ Delete</button>
+                </div>
+              `).join('')
+            : '<p style="font-size:0.8rem; color:var(--text-muted);">No projects added yet.</p>';
+        }
         state.projects.forEach(p => {
           const card = document.createElement('article');
           card.className = 'project-card powered-reveal';
@@ -2499,10 +2603,29 @@
           `;
           projectsContainer.appendChild(card);
         });
+        updateContentEditableAttributes();
+      }
+
+      function emptyAdminList(message) {
+        return `<p style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(message)}</p>`;
+      }
+
+      function adminDeleteRow(title, action, id) {
+        return `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; padding:0.65rem 0; border-bottom:1px solid var(--border-subtle);">
+            <span style="font-size:0.82rem; font-weight:600; color:var(--text-main);">${escapeHtml(title)}</span>
+            <button type="button" class="btn btn-secondary" style="flex:0 0 auto; color:#ef4444; font-size:0.72rem; padding:0.3rem 0.55rem;" data-action="${action}" data-id="${escapeHtml(id)}">✕ Delete</button>
+          </div>
+        `;
       }
 
       function renderResearch() {
         researchContainer.innerHTML = '';
+        if (adminResearchList) {
+          adminResearchList.innerHTML = state.research.length
+            ? state.research.map(r => adminDeleteRow(r.title, 'delete-research', r.id)).join('')
+            : emptyAdminList('No publications added yet.');
+        }
         state.research.forEach(r => {
           const card = document.createElement('article');
           card.className = 'research-card powered-reveal';
@@ -2527,6 +2650,15 @@
 
       function renderInternshipsAndCerts() {
         internshipsContainer.innerHTML = '';
+        if (adminExperienceList) {
+          const experienceItems = [
+            ...state.internships.map(i => adminDeleteRow(i.role, 'delete-internship', i.id)),
+            ...state.certifications.map(c => adminDeleteRow(c.title, 'delete-cert', c.id))
+          ];
+          adminExperienceList.innerHTML = experienceItems.length
+            ? experienceItems.join('')
+            : emptyAdminList('No experience or certifications added yet.');
+        }
         state.internships.forEach(i => {
           const card = document.createElement('div');
           card.className = 'internship-card powered-reveal';
@@ -2560,6 +2692,11 @@
 
       function renderBooks() {
         booksContainer.innerHTML = '';
+        if (adminBooksList) {
+          adminBooksList.innerHTML = state.books.length
+            ? state.books.map(b => adminDeleteRow(b.title, 'delete-book', b.id)).join('')
+            : emptyAdminList('No books added yet.');
+        }
         state.books.forEach(b => {
           const card = document.createElement('article');
           card.className = 'book-card powered-reveal';
@@ -2783,6 +2920,7 @@
         btnSaveFromBanner.addEventListener('click', () => {
           readInPageEditsIntoState();
           persistState(true);
+          exitAdminMode();
         });
       }
 
@@ -2796,9 +2934,39 @@
       // Exit Admin Mode
       if (btnExitAdmin) {
         btnExitAdmin.addEventListener('click', () => {
-          sessionStorage.removeItem('portfolio_admin_auth');
-          window.location.hash = '';
-          window.location.href = window.location.pathname;
+          exitAdminMode();
+        });
+      }
+
+      function exitAdminMode() {
+        setLiveEditMode(false);
+        sessionStorage.removeItem('portfolio_admin_auth');
+        document.body.classList.remove('admin-mode-unlocked');
+        if (adminSidebar) adminSidebar.classList.add('collapsed');
+        window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
+        renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast('Saved and returned to visitor mode.');
+      }
+
+      if (fileResumeInput) {
+        fileResumeInput.addEventListener('change', (event) => {
+          const file = event.target.files && event.target.files[0];
+          if (!file) return;
+          if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+            fileResumeInput.value = '';
+            showToast('Please upload a PDF resume.', true);
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => {
+            state.socials.resume = String(reader.result || '');
+            persistState(false);
+            renderAll();
+            showToast('Resume PDF uploaded. Save All Changes to finish.');
+          };
+          reader.onerror = () => showToast('The resume PDF could not be read.', true);
+          reader.readAsDataURL(file);
         });
       }
 
@@ -2958,28 +3126,52 @@
         const id = btn.dataset.id;
 
         if (action === 'delete-project') {
-          state.projects = state.projects.filter(p => p.id !== id);
+          const projectIndex = state.projects.findIndex(p => String(p.id) === String(id));
+          if (projectIndex < 0) {
+            showToast('Project could not be found.', true);
+            return;
+          }
+          const project = state.projects[projectIndex];
+          if (!window.confirm(`Delete "${project.title}"? This cannot be undone.`)) return;
+          state.projects.splice(projectIndex, 1);
           renderProjects();
           badgeProjCount.textContent = `${state.projects.length} Works`;
           persistState(false);
+          showToast('Project deleted.');
         } else if (action === 'delete-research') {
-          state.research = state.research.filter(r => r.id !== id);
+          const index = state.research.findIndex(r => String(r.id) === String(id));
+          if (index < 0) return;
+          if (!window.confirm(`Delete "${state.research[index].title}"? This cannot be undone.`)) return;
+          state.research.splice(index, 1);
           renderResearch();
           badgeResearchCount.textContent = `${state.research.length} Papers`;
           persistState(false);
+          showToast('Publication deleted.');
         } else if (action === 'delete-internship') {
-          state.internships = state.internships.filter(i => i.id !== id);
+          const index = state.internships.findIndex(i => String(i.id) === String(id));
+          if (index < 0) return;
+          if (!window.confirm(`Delete "${state.internships[index].role}"? This cannot be undone.`)) return;
+          state.internships.splice(index, 1);
           renderInternshipsAndCerts();
           persistState(false);
+          showToast('Experience deleted.');
         } else if (action === 'delete-cert') {
-          state.certifications = state.certifications.filter(c => c.id !== id);
+          const index = state.certifications.findIndex(c => String(c.id) === String(id));
+          if (index < 0) return;
+          if (!window.confirm(`Delete "${state.certifications[index].title}"? This cannot be undone.`)) return;
+          state.certifications.splice(index, 1);
           renderInternshipsAndCerts();
           persistState(false);
+          showToast('Certification deleted.');
         } else if (action === 'delete-book') {
-          state.books = state.books.filter(b => b.id !== id);
+          const index = state.books.findIndex(b => String(b.id) === String(id));
+          if (index < 0) return;
+          if (!window.confirm(`Delete "${state.books[index].title}"? This cannot be undone.`)) return;
+          state.books.splice(index, 1);
           renderBooks();
           badgeBooksCount.textContent = `${state.books.length} Authored`;
           persistState(false);
+          showToast('Book deleted.');
         }
       });
 
@@ -3006,6 +3198,7 @@
 
       function syncSidebarToState() {
         state.name = document.getElementById('inputName').value.trim() || state.name;
+        state.heroTitle = document.getElementById('inputHeroTitle').value.trim() || defaultState.heroTitle;
         state.tagline = document.getElementById('inputTagline').value.trim() || state.tagline;
         state.shortBio = document.getElementById('inputShortBio').value.trim() || state.shortBio;
 
@@ -3023,8 +3216,9 @@
 
       document.getElementById('btnMasterSave').addEventListener('click', () => {
         readInPageEditsIntoState();
+        syncSidebarToState();
         persistState(true);
-        renderAll();
+        exitAdminMode();
       });
 
       document.getElementById('btnExportJSON').addEventListener('click', () => {
